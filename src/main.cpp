@@ -3,36 +3,8 @@
 #include "BeatSaberUI.hpp"
 #include "CustomExitFlowCoordinator.hpp"
 #include "MenuColor.hpp"
-
-Image* GetImageByName(Button* Parent, std::string name)
-{
-    auto Images = Parent->GetComponentsInChildren<Image*>();
-    for (int i = 0; i < Images->Length(); i++)
-    {
-        Image* Item = Images->values[i];
-        if(to_utf8(csstrtostr(Item->get_name())) == name)
-        {
-            return Item;
-        }
-        
-    }
-    return Images->values[0];
-}
-
-RectTransform* GetRectByName(Button* Parent, std::string name)
-{
-    auto Rects = Parent->GetComponentsInChildren<RectTransform*>();
-    for (int i = 0; i < Rects->Length(); i++)
-    {
-        RectTransform* Rect = Rects->values[i];
-        if(to_utf8(csstrtostr(Rect->get_name())) == name)
-        {
-            return Rect;
-        }
-        
-    }
-    return Rects->values[0];
-}
+#include "ScrollButtons.hpp"
+#include "SongInfo.hpp"
 
 std::string DoubleArrow = R"(iVBORw0KGgoAAAANSUhEUgAAADgAAAAkCAYAAADckvn+AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAABh0RVh0U29mdHdhcmUAcGFpbnQubmV0IDQuMS41ZEdYUgAAAixJREFUaEPtlslOwzAYhCsh8RhAQWzl1lZsBd4FnggeDU6c2NcDULYDl5aZ4lbBmSROYktp1ZE+OZr8v+2/atWp9fv9iUaaDsyANcsLySrgmepdKtJ04KTX671gbVp+CJo8CxyLd5lIM4MjMBAOfcXSAqrOBy1zxlCHQNUlIs0UdnDgD9aRAg7J4d6wjmTO3gaqXiLNFM5ATOYibaB6itC2h4voFKgeiTRT2ADPQKkLNoHqywP34F5KPJt3UH0SaWbQwKf7hFWJF9sCqs8Ffv3kcObMBlB9iUjTgawhc/1ODInDQY9gHai+VKTpCA/kwUpdfAC7WFVfDFPrfTgizRzwz/4BxIRLv2PpANUXpWNqlbh3qUAhzZwwZdyDmByG3AMfQIl7cm/V54w0C7AC5JAQB+Agdk/acHeAe9o9uZFmQXghXkzpE+zXjPhsPCXusQzs/QshTQeSwjYvdguUvsCBgc9K7FXDVSpsL4EboMTBvv8eY2IPe+39Khm2F0HSkErXgD32PpUO27wwL54l1tSB3V/tsA2PKy9+BZLEd3VTG6X6YTty6QVwCWzR47toLRmPsG1deh5Eh7wA9AbvI7XjE7atAQkHOjfMGW+AqZ2IsD1r+OebWu/DEWnmYBq2sUzDttB4hm0wrK182E4iVNgujDRL4jtsl0KaHvAVtksjTU+UDdtekKZHnMI2UL1ekKZnMsN2SKQZgNSwHRJpBiIxbIdEmgGRYTsc/dovkLE8tDZQiesAAAAASUVORK5CYII=)";
 std::string Speed = R"(iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAQoSURBVFhH7Zfbi1VlGMbHQwo6WVGeIUGUwAvxFMQIoRfqpEKB1EWIh0HrIoSO4N9QE6SgV9pFgShqN5WKYF1EImgFQaEZHogUKXXEoqyc6fe87zNr7z1rRvee0QZi/+Dh+97nPay91957rbVbmjRpcp/o7u6ejbagvegbdBX9ZWkvT7lX0Gy33V96enrGcLCN6CT7hqDnBMsG9IDH3Vs4wBp0IY42BJhxHj3rsUOHmQ8z8GCOrwX/NjqOOpE+yhct7eWdQLddXgP+PjTBhxkczJnJkB9zZAW871heYp3s0gGhZip6GX2f3RXwzrDMdGlj0DwLXc5RCfEltIntaJcV4C9A+vjOofm2C9SD9Kb6zryMZrmsPmiYhn7yjID4CzTJ+SfQUuwR0QDEu7IyanfZjhdGvAzNUMw6GX2ZlQnxeZYp0XA3KBxFw+fRaYg/QGOVZ21Df9t/O5qAUL/QAH+9bdXvsfc7issN61j0YRQb4mMso6LpTlD4ZrYkxEdYikbiVzMTueO2A+JF2AsdBngXszrqX7DdeyKOZiYhfs3p/qFAX+ibrlfDaZaHnA6Ip+CfRL+g1bYHhJoOdB19hsbbDjQb76yOJdjfYBn4o6bg3SxNiJ+Wz/YRKYruAcx6jNkPas+q73IB8TtR1BdyrSSrz97H8lmfQX+iP1B7FA8SxupO9AbSGS1eCPtP86hx3Juo5kwHmOtc08s8+7sdq3l3FA8CevVGqz9Oven40RAuTDfBXxtN1WDud14FZ23Lb0c6e9Jy23VDzxx02KNrwH/LZaorbgjs99qugPmr8yrotB1gNfwdpF7fsx0oLknV4H3NssSlAV7x/Wd/xXaCMdW5gLihM0X9BLQT6U5zDR1A1z2uwPkOtiPdWoC/MqsS4sptlKDNfi+P25+OlqO4SPcHtSPIH8q2/iF/C3WyLS5Zmok0e7rjGVmdED8VhYJglf2AeLwa2XY5PuTSEuTmqGYgyH+ESvdazXRev+hpbFsV94K30qVxFp5Lu0BX+XbvRZdLS1C3wjUlyG1yWQlyuigHnqGHiQK8yjMjQd+L5aNIH4HeZRfrFpeWIDcJ3crOCvLQRJeVIKdbpmZ/wqrr48RoNMRLXRpncF7aCcnS49KdoF4X3263q1+87nRdUL/A7QHxXKfiBY7D+CdTkexwqm5oW0Lfe2ib9rbrhr7NcXBgr0vTOKcSzG8zHQX7bevAep5bj3Snufvj0CBh/oE4OOi12K6Aud15Feie3CqfdWuYydYoHgLMfhLpevgzWmRP19HffAwdf1sUV4O52PmAOH4YKrbVf2ODMON9j9O8uLfrWLYC4rYorgZfF9wfsmT44DXoj1TxV6IGEsVj+3DBCyz+LpQgrx/EV1k6LJxCpX+MNVCgB1fd+p7/L8Ux9bAQP8wmTZr8f2hp+ReWCz5Y6C35EgAAAABJRU5ErkJggg==)";
@@ -43,370 +15,21 @@ Sprite* DoubleArrowSprite;
 Sprite* TripleArrowSprite;
 Sprite* GraphSprite;
 
-
-static void SetStatButtonText(RectTransform* rect, std::string text)
-{
-	TextMeshProUGUI* textMeshProUGUI = rect->GetComponentsInChildren<TextMeshProUGUI*>()->values[0];
-	if (textMeshProUGUI != nullptr)
-	{
-		textMeshProUGUI->SetText(createcsstr(text));
-	}
-}
-
-static void SetStatButtonIcon(RectTransform* rect, Sprite* icon)
-{
-    Image* img = rect->GetComponentInChildren<Image*>();
-    
-    if (img != nullptr)
-    {
-        img->set_sprite(icon);
-        img->set_color(UnityEngine::Color::get_white());
-    }
-}
-
-Sprite* Base64ToSprite(std::string base64, int width, int height)
-{
-    auto Bytes = System::Convert::FromBase64String(createcsstr(base64));
-    Texture2D* tex = Texture2D::New_ctor(width, height);
-    tex->_set_GenerateAllMips(false);
-    CRASH_UNLESS(RunMethod("UnityEngine", "ImageConversion", "LoadImage", tex, Bytes, false));
-    
-    
-    auto rect = (UnityEngine::Rect){0.0f, 0.0f, (float)width, (float)height};
-    auto pivot = (UnityEngine::Vector2){0.5f, 0.5f};
-    UnityEngine::Vector4 zero = (UnityEngine::Vector4){0, 0, 0, 0};
-    Sprite* out = CRASH_UNLESS(il2cpp_utils::RunMethod<Sprite*>("UnityEngine", "Sprite", "Create", tex, rect, pivot, 1024.0f, 1u, 0, zero, false).value_or(nullptr));
-    return out;
-}
-RectTransform* _njsStatButton;
-
-RectTransform* _ppStatButton;
-
 Button* DeleteButton;
 
 bool FirstTime = true;
 
-void CreateInfoButtons(StandardLevelDetailView* self)
-{
-    auto statsPanel = self->levelParamsPanel;
-        auto statTransforms = statsPanel->GetComponentsInChildren<RectTransform*>();
-
-        auto Texts = statsPanel->GetComponentsInChildren<TextMeshProUGUI*>();
-
-        int x = 0;
-        for (int i = 0; i < Texts->Length(); i++)
-        {
-            if(to_utf8(csstrtostr(Texts->values[i]->get_name())) == "ValueText")
-            {
-                
-                auto text = Texts->values[i];
-                float fontSize = text->get_fontSize();
-                text->set_fontSize(fontSize -= 0.75f);
-            }
-        }
-        RectTransform* panelRect = (RectTransform*)self->levelParamsPanel->get_transform();
-        auto PanelSize = panelRect->get_sizeDelta();
-        panelRect->set_sizeDelta(UnityEngine::Vector2 {PanelSize.x * 1.2f, PanelSize.y * 1.2f});
-        
-        for (int i = 0; i < statTransforms->Length(); i++)
-        {
-            auto r = statTransforms->values[i];
-            if (to_utf8(csstrtostr(r->get_name())) == "Separator")
-            {
-                continue;
-            }
-            auto rSize = r->get_sizeDelta();
-            r->set_sizeDelta(UnityEngine::Vector2 {rSize.x * 0.9f, rSize.y * 0.9f});   
-        }
-
-        
-        Transform* statsTransform = statsPanel->get_transform();
-
-        // inject our components
-        SpeedSprite = Base64ToSprite(Speed, 40, 40);
-        //GraphSprite = Base64ToSprite(Graph, 100, 100);
-
-        _njsStatButton = Object::Instantiate(statTransforms->values[1], statsTransform, false);
-        SetStatButtonIcon(_njsStatButton, SpeedSprite);
-
-        //_ppStatButton = Object::Instantiate(statTransforms->values[1], statsTransform, false);
-        //SetStatButtonIcon(_ppStatButton, GraphSprite);
-
-        // shrink title
-        self->songNameText->set_fontSize(5.0f);   
-
-        //Shrink play buttons
-        RectTransform* PlayRect = (RectTransform*)self->playButton->get_transform()->get_parent();
-        //DeleteButton = Object::Instantiate(self->playButton->get_gameObject(), PlayRect, false)->GetComponent<Button*>();
-        PlayRect->set_localScale(UnityEngine::Vector3(0.9f, 0.9f, 0.9f));
-}
-
 bool FirstTime2 = true;
-
-SongID songID = SongID(std::string("Wow"), BeatmapDifficulty::Easy);
 
 MAKE_HOOK_OFFSETLESS(StandardLevelDetailView_RefreshContent, void, StandardLevelDetailView* self) {
     StandardLevelDetailView_RefreshContent(self);
-    auto id = self->level->get_levelID();
-    auto ConvertedID = to_utf8(csstrtostr(id));
-    //std::string hash = GetHash(str_toupper(ConvertedID));
-    float _njs = 0.0f;
-    float _stars = 0.0f;
-    float _pp = 0.0f;
-    //BeatmapDifficulty diff = self->selectedDifficultyBeatmap->get_difficulty();
-    
-    //songID.difficulty = diff;
-    //songID.id = hash;
-
-    bool CustomLevel = ConvertedID.find("custom_level_") != std::string::npos;
-
-    _njs = CustomLevel ? self->selectedDifficultyBeatmap->get_noteJumpMovementSpeed() : 0.0f;
-    //_pp = IsRanked(songID) && CustomLevel ? GetPP(songID) : 0.0f;
-
-    if(FirstTime2)
-    {
-        CreateInfoButtons(self);
-        FirstTime2 = false;
-    }
-    SetStatButtonText(_njsStatButton, Round(_njs, 1));
-    //SetStatButtonText(_ppStatButton, Round(_pp, 2));
+    CreateInfoButtons(self);
 }
 
 MAKE_HOOK_OFFSETLESS(MenuTransitionsHelper_RestartGame, void, Il2CppObject* self) {
     FirstTime = true;
     FirstTime2 = true;
     MenuTransitionsHelper_RestartGame(self);
-}
-
-Button* _pageUpFastButton;
-Button* _pageDownFastButton;
-Button* _scrollBottomButton;
-Button* _scrollTopButton;
-Button* originalUp;
-Button* originalDown;
-TableView* tableview;
-LevelCollectionTableView* CollectionTableView;
-const float SEGMENT_PERCENT = 0.1f;
-const int LIST_ITEMS_VISIBLE_AT_ONCE = 6;
-Array<IPreviewBeatmapLevel*>* beatmaps;
-
-void RefreshQuickScroll()
-{
-    _pageUpFastButton->set_interactable(originalUp->get_interactable());
-    _pageDownFastButton->set_interactable(originalDown->get_interactable());
-    _scrollBottomButton->set_interactable(originalDown->get_interactable());
-    _scrollTopButton->set_interactable(originalUp->get_interactable());
-}
-
-//Stolen from System.Math
-int Sign(int value)
-{
-	if (value < 0)
-	{
-		return -1;
-	}
-	if (value > 0)
-	{
-		return 1;
-	}
-	return 0;
-}
-
-//Hardcoded bad but whatever
-//System.Array.FindIndex
-int FindIndex(Array<IPreviewBeatmapLevel*>* array, int startIndex, int count, std::string TargetID)
-{
-    int num = startIndex + count;
-	for (int i = startIndex; i < num; i++)
-	{
-		if (to_utf8(csstrtostr(array->values[i]->get_levelID())) == TargetID)
-		{
-			return i;
-		}
-	}
-    return -1;
-}
-
-void ScrollToLevelByRow(int selectedIndex)
-{
-
-    int selectedRow = CollectionTableView->selectedRow;
-    if (selectedRow != selectedIndex && CollectionTableView->get_isActiveAndEnabled())
-    {
-        CollectionTableView->HandleDidSelectRowEvent(tableview, selectedIndex);
-    }
-    tableview->ScrollToCellWithIdx(selectedIndex, TableViewScroller::ScrollPositionType::Beginning, true);
-    //tableview->SelectCellWithIdx(selectedIndex, true);  
-    RefreshQuickScroll();          
-}
-
-void JumpSongList(int numJumps, float segmentPercent)
-{
-    int totalSize = beatmaps->Length();
-    int segmentSize = (int)(totalSize * segmentPercent);
-
-    if (segmentSize < LIST_ITEMS_VISIBLE_AT_ONCE)
-    {
-        segmentSize = LIST_ITEMS_VISIBLE_AT_ONCE;
-    }
-    int currentRow = CollectionTableView->selectedRow;
-    int jumpDirection = Sign(numJumps);
-    int newRow = currentRow + (jumpDirection * segmentSize);
-
-    if (newRow <= 0)
-    {
-        newRow = 0;
-    }
-    else if (newRow >= totalSize)
-    {
-        newRow = totalSize - 1;
-    }
-
-
-    int selectedIndex = 0;
-
-    if (totalSize <= 0)
-    {
-        return;
-    }
-
-    int selectedRow = FindIndex(beatmaps, 0, totalSize, to_utf8(csstrtostr(beatmaps->values[newRow]->get_levelID())));
-    if (selectedIndex < 0)
-    {
-        int selectedRow = CollectionTableView->selectedRow;
-
-        selectedIndex = System::Math::Min(totalSize, selectedRow);
-    }
-    else
-    {
-        // the header counts as an index, so if the index came from the level array we have to add 1.
-        selectedIndex += 1;
-    }
-
-    CollectionTableView->SelectLevel(beatmaps->values[newRow]);   
-    RefreshQuickScroll();
-}
-
-//For action purposes
-void QuickScrollUp()
-{
-    beatmaps = CollectionTableView->previewBeatmapLevels;
-    JumpSongList(-1, SEGMENT_PERCENT);
-}
-
-void QuickScrollDown()
-{
-    beatmaps = CollectionTableView->previewBeatmapLevels;
-    JumpSongList(1, SEGMENT_PERCENT);
-}
-
-void ScrollToBottom()
-{
-    beatmaps = CollectionTableView->previewBeatmapLevels;
-    ScrollToLevelByRow(beatmaps->Length());
-    CollectionTableView->SelectLevel(beatmaps->values[beatmaps->Length()]); 
-}
-void ScrollToTop()
-{
-    beatmaps = CollectionTableView->previewBeatmapLevels;
-    ScrollToLevelByRow(0);
-    CollectionTableView->SelectLevel(beatmaps->values[0]); 
-}
-
-void ToggleQuickScrollButtons(bool val)
-{
-    _pageDownFastButton->get_gameObject()->get_gameObject()->SetActive(val);
-    _pageUpFastButton->get_gameObject()->get_gameObject()->SetActive(val);
-    _scrollBottomButton->get_gameObject()->get_gameObject()->SetActive(val);
-    _scrollTopButton->get_gameObject()->get_gameObject()->SetActive(val);
-}
-
-MAKE_HOOK_OFFSETLESS(LevelCollectionTableView_Init, void, LevelCollectionTableView* self)
-{
-    LevelCollectionTableView_Init(self);
-    CollectionTableView = self;
-    
-    beatmaps = self->previewBeatmapLevels;
-    /*if(!self->showLevelPackHeader)
-    {
-        ToggleQuickScrollButtons(false);
-        return;
-    }
-    else
-    {
-        ToggleQuickScrollButtons(true);
-    }*/
-    
-    
-    if(!FirstTime)
-    {
-        tableview = self->tableView;
-        originalDown = tableview->pageDownButton;
-        originalUp = tableview->pageUpButton;
-        RefreshQuickScroll();
-
-    }
-
-    if(!FirstTime) return;
-    FirstTime = false;
-    tableview = self->tableView;
-    originalUp = tableview->pageUpButton;
-    _pageUpFastButton = Object::Instantiate(originalUp, self->get_transform(), false);
-    RectTransform* FastUpRectTransform = (RectTransform*)_pageUpFastButton->get_transform();
-    FastUpRectTransform->set_anchorMin(UnityEngine::Vector2(0.5f, 1.0f));
-    FastUpRectTransform->set_anchorMax(UnityEngine::Vector2(0.5f, 1.0f));
-    FastUpRectTransform->set_anchoredPosition(UnityEngine::Vector2(-26.0f, 1.0f));
-    FastUpRectTransform->set_sizeDelta(UnityEngine::Vector2(8.0f, 6.0f));
-    DoubleArrowSprite = Base64ToSprite(DoubleArrow, 56, 36);
-    GetRectByName(_pageUpFastButton, "BG")->set_sizeDelta(UnityEngine::Vector2(8.0f, 6.0f));
-    GetImageByName(_pageUpFastButton, "Arrow")->set_sprite(DoubleArrowSprite);
-    
-    _scrollTopButton = Object::Instantiate(originalUp, self->get_transform(), false);
-    RectTransform* FastTopRectTransform = (RectTransform*)_scrollTopButton->get_transform();
-    FastTopRectTransform->set_anchorMin(UnityEngine::Vector2(0.5f, 1.0f));
-    FastTopRectTransform->set_anchorMax(UnityEngine::Vector2(0.5f, 1.0f));
-    FastTopRectTransform->set_anchoredPosition(UnityEngine::Vector2(-35.5f, 1.0f));
-    FastTopRectTransform->set_sizeDelta(UnityEngine::Vector2(8.0f, 6.0f));
-    TripleArrowSprite = Base64ToSprite(TripleArrow, 56, 50);
-    GetRectByName(_scrollTopButton, "BG")->set_sizeDelta(UnityEngine::Vector2(8.0f, 6.0f));
-    GetImageByName(_scrollTopButton, "Arrow")->set_sprite(TripleArrowSprite);  
-
-    originalDown = tableview->pageDownButton;
-    _pageDownFastButton = Object::Instantiate(originalDown, self->get_transform(), false);
-    RectTransform* FastDownRectTransform = (RectTransform*)_pageDownFastButton->get_transform();
-    FastDownRectTransform->set_anchorMin(UnityEngine::Vector2(0.5f, 0.0f));
-    FastDownRectTransform->set_anchorMax(UnityEngine::Vector2(0.5f, 0.0f));
-    FastDownRectTransform->set_anchoredPosition(UnityEngine::Vector2(-26.0f, -1.0f));
-    FastDownRectTransform->set_sizeDelta(UnityEngine::Vector2(8.0f, 6.0f));
-    GetRectByName(_pageDownFastButton, "BG")->set_sizeDelta(UnityEngine::Vector2(8.0f, 6.0f));
-    GetImageByName(_pageDownFastButton, "Arrow")->set_sprite(DoubleArrowSprite);
-    
-    auto action = MakeAction<UnityEngine::Events::UnityAction>(il2cpp_functions::class_get_type(il2cpp_utils::GetClassFromName("UnityEngine.Events", "UnityAction")), (Il2CppObject*)nullptr, RefreshQuickScroll);
-    originalUp->get_onClick()->AddListener(action);
-    originalDown->get_onClick()->AddListener(action);
-    auto actionUp = MakeAction<UnityEngine::Events::UnityAction>(il2cpp_functions::class_get_type(il2cpp_utils::GetClassFromName("UnityEngine.Events", "UnityAction")), (Il2CppObject*)nullptr, QuickScrollUp);
-    auto actionDown = MakeAction<UnityEngine::Events::UnityAction>(il2cpp_functions::class_get_type(il2cpp_utils::GetClassFromName("UnityEngine.Events", "UnityAction")), (Il2CppObject*)nullptr, QuickScrollDown);
-
-    _pageUpFastButton->get_onClick()->AddListener(actionUp);
-    _pageDownFastButton->get_onClick()->AddListener(actionDown);
-    
-
-    _scrollBottomButton = Object::Instantiate(originalDown, self->get_transform(), false);
-    RectTransform* FastBottomRectTransform = (RectTransform*)_scrollBottomButton->get_transform();
-    FastBottomRectTransform->set_anchorMin(UnityEngine::Vector2(0.5f, 0.0f));
-    FastBottomRectTransform->set_anchorMax(UnityEngine::Vector2(0.5f, 0.0f));
-    FastBottomRectTransform->set_anchoredPosition(UnityEngine::Vector2(-35.5f, -1.0f));
-    FastBottomRectTransform->set_sizeDelta(UnityEngine::Vector2(8.0f, 6.0f));
-    GetRectByName(_scrollBottomButton, "BG")->set_sizeDelta(UnityEngine::Vector2(8.0f, 6.5f));
-    GetImageByName(_scrollBottomButton, "Arrow")->set_sprite(TripleArrowSprite);
-
-    auto actionBottom = MakeAction<UnityEngine::Events::UnityAction>(il2cpp_functions::class_get_type(il2cpp_utils::GetClassFromName("UnityEngine.Events", "UnityAction")), (Il2CppObject*)nullptr, ScrollToBottom);
-
-    _scrollBottomButton->get_onClick()->AddListener(actionBottom);
-
-    auto actionTop = MakeAction<UnityEngine::Events::UnityAction>(il2cpp_functions::class_get_type(il2cpp_utils::GetClassFromName("UnityEngine.Events", "UnityAction")), (Il2CppObject*)nullptr, ScrollToTop);
-
-    _scrollTopButton->get_onClick()->AddListener(actionTop);
 }
 
 MAKE_HOOK_OFFSETLESS(WebRequest, void, HealthWarningFlowCoordinator* self, bool firstActivation, FlowCoordinator::ActivationType activationType) {
@@ -443,8 +66,14 @@ MAKE_HOOK_OFFSETLESS(TryExit, void, MainFlowCoordinator* self, MainMenuViewContr
     if (subMenuType == MainMenuViewController::MenuButton::Quit && Config.ConfirmQuit)
     {
         ShowPanel();
+        return;
     }
     TryExit(self, viewController, subMenuType);
+}
+MAKE_HOOK_OFFSETLESS(LevelCollectionTableView_Init, void, LevelCollectionTableView* self)
+{
+    LevelCollectionTableView_Init(self);
+    CreateQuickScrollButtons(self);
 }
 
 extern "C" void setup(ModInfo& info) {
@@ -500,8 +129,8 @@ extern "C" void load() {
 
     il2cpp_functions::Init();
 
-    custom_types::Register::RegisterType<MenuUtils::CustomExitViewController>();
     custom_types::Register::RegisterType<MenuUtils::CustomExitFlowCoordinator>();
+    custom_types::Register::RegisterType<MenuUtils::CustomExitViewController>();
     INSTALL_HOOK_OFFSETLESS(TryExit, il2cpp_utils::FindMethodUnsafe("", "MainFlowCoordinator", "HandleMainMenuViewControllerDidFinish", 2));
     INSTALL_HOOK_OFFSETLESS(Lights, il2cpp_utils::FindMethodUnsafe("", "MainFlowCoordinator", "DidActivate", 2));
     INSTALL_HOOK_OFFSETLESS(Lights2, il2cpp_utils::FindMethodUnsafe("", "SoloFreePlayFlowCoordinator", "DidActivate", 2));

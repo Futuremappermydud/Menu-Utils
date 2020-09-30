@@ -66,3 +66,4 @@
 #include "../extern/codegen/include/TMPro/TextMeshProUGUI.hpp"
 #include "../extern/codegen/include/UnityEngine/Transform.hpp"
 #include "../extern/codegen/include/UnityEngine/GameObject.hpp"
+#include "../extern/codegen/include/UnityEngine/TextureFormat.hpp"

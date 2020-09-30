@@ -38,9 +38,9 @@ LOCAL_SRC_FILES := extern/libcodegen_0_2_6.so
 include $(PREBUILT_SHARED_LIBRARY)
 # Creating prebuilt for dependency: custom-types - version: 0.2.1
 include $(CLEAR_VARS)
-LOCAL_MODULE := custom-types_0_2_2
+LOCAL_MODULE := custom-types_0_2_3
 LOCAL_EXPORT_C_INCLUDES := extern/custom-types
-LOCAL_SRC_FILES := extern/libcustom-types_0_2_2.so
+LOCAL_SRC_FILES := extern/libcustom-types_0_2_3.so
 include $(PREBUILT_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
@@ -51,7 +51,7 @@ LOCAL_SRC_FILES += $(call rwildcard,extern/beatsaber-hook/src/inline-hook,*.c)
 LOCAL_SHARED_LIBRARIES += modloader
 LOCAL_SHARED_LIBRARIES += beatsaber-hook_0_7_1
 LOCAL_SHARED_LIBRARIES += codegen_0_2_6
-LOCAL_SHARED_LIBRARIES += custom-types_0_2_2
+LOCAL_SHARED_LIBRARIES += custom-types_0_2_3
 LOCAL_LDLIBS += -llog
 LOCAL_CFLAGS += -I'c:/Program Files/Unity/Hub/Editor/2019.3.1f1/Editor/Data/il2cpp/libil2cpp' -DID='"MenuUtils"' -DVERSION='"0.1.0"' -I'./shared' -I'./extern' -I'./extern/codegen/include' -I'./extern/beatsaber-hook'
 LOCAL_CPPFLAGS += -std=c++2a

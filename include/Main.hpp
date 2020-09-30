@@ -30,6 +30,18 @@ using namespace HMUI;
 using namespace TMPro;
 using namespace il2cpp_utils;
 
+extern bool FirstTime;
+extern bool FirstTime2;
+
+extern std::string DoubleArrow;
+extern std::string Speed;
+extern std::string TripleArrow;
+extern std::string Graph;
+extern Sprite* SpeedSprite;
+extern Sprite* DoubleArrowSprite;
+extern Sprite* TripleArrowSprite;
+extern Sprite* GraphSprite;
+
 static ModInfo modInfo;
 
 static Configuration& getConfig() {

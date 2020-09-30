@@ -7,4 +7,4 @@ if (-not ($PSVersionTable.PSEdition -eq "Core")) {
 }
 
 & $buildScript NDK_PROJECT_PATH=$PSScriptRoot APP_BUILD_SCRIPT=$PSScriptRoot/Android.mk NDK_APPLICATION_MK=$PSScriptRoot/Application.mk
-Compress-Archive -Path "./libs/arm64-v8a/libmenuutils.so","./bmbfmod.json","./extern/libbeatsaber-hook_0_7_1.so","./extern/libcodegen_0_2_6.so","./extern/libcustom-types_0_2_2.so" -DestinationPath "./menuutils_v0.1.0.zip" -Update
+Compress-Archive -Path "./libs/arm64-v8a/libmenuutils.so","./bmbfmod.json","./extern/libbeatsaber-hook_0_7_1.so","./extern/libcodegen_0_2_6.so","./extern/libcustom-types_0_2_3.so" -DestinationPath "./menuutils_v0.1.0.zip" -Update
