@@ -45,3 +45,5 @@ ndkpath.txt
 *.zip
 
 extern/
+qpm.shared.json
+*.backup
